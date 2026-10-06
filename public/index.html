@@ -57,13 +57,18 @@
             }
         }
 
-        async function refresh() {
+        async function loadEntries() {
             try {
                 const listRes = await fetch("/api/readings");
                 if (listRes.ok) {
                     renderEntries(await listRes.json());
                 }
+            } catch (err) {}
+        }
 
+        async function refresh() {
+            loadEntries();
+            try {
                 const res = await fetch("/api/sensor");
                 const data = await res.json();
                 if (data.inches === null || data.inches === undefined) {

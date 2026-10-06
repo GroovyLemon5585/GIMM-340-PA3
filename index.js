@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
 
+const fs = require("fs");
 const path = require("path");
 
 const app = express();
@@ -26,6 +27,14 @@ app.post("/api/sensor", async (req, res) => {
         return res.status(400).json({ message: "distance must be a number" });
     }
 
+    latest = { distance, inches: toInches(distance), time: Date.now() };
+
+    fs.appendFile(
+        path.join(__dirname, "distance.sql"),
+        `INSERT INTO \`distance\` (\`distance\`) VALUES (${distance});\n`,
+        (err) => { if (err) console.error(err); }
+    );
+
     try {
         await db.execute("INSERT INTO distance (distance) VALUES (?)", [distance]);
     } catch (err) {
@@ -33,7 +42,6 @@ app.post("/api/sensor", async (req, res) => {
         return res.status(500).json({ message: "Database error" });
     }
 
-    latest = { distance, inches: toInches(distance), time: Date.now() };
     res.json({
         message: "Sensor data received"
     });
