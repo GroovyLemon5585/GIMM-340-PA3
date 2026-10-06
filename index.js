@@ -59,7 +59,7 @@ app.get("/api/readings", async (req, res) => {
     }
 });
 
-[3000, 8080].forEach((p) => {
+[3000].forEach((p) => {
     app.listen(p, "0.0.0.0", () => {
         console.log(`Server running on port ${p}`);
     });
