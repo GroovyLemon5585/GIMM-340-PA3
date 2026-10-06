@@ -32,7 +32,7 @@ app.post("/api/sensor", async (req, res) => {
         await db.execute("INSERT INTO distance (distance) VALUES (?)", [distance]);
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ message: "Database error" });
+        return res.status(500).json({ message: "Database error", code: err.code });
     }
 
     res.json({
@@ -55,7 +55,7 @@ app.get("/api/readings", async (req, res) => {
         })));
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Database error" });
+        res.status(500).json({ message: "Database error", code: err.code });
     }
 });
 
