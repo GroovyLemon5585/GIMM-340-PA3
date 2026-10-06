@@ -13,27 +13,64 @@
 
         <div class="reading">
             <span id="distance">--</span>
-            <span class="unit">cm</span>
+            <span class="unit">in</span>
         </div>
 
         <p id="status" class="status">Waiting for data...</p>
         <p class="updated">Last update: <span id="updated">never</span></p>
+
+        <h2 class="log-title">Recorded Distances (<span id="count">0</span>)</h2>
+        <div class="log">
+            <table>
+                <thead>
+                    <tr><th>#</th><th>Distance (in)</th></tr>
+                </thead>
+                <tbody id="entries">
+                    <tr><td colspan="2" class="empty">No entries yet</td></tr>
+                </tbody>
+            </table>
+        </div>
     </main>
 
     <script>
         const distanceEl = document.getElementById("distance");
         const statusEl = document.getElementById("status");
         const updatedEl = document.getElementById("updated");
+        const entriesEl = document.getElementById("entries");
+        const countEl = document.getElementById("count");
+
+        function renderEntries(readings) {
+            countEl.textContent = readings.length;
+            entriesEl.innerHTML = "";
+            if (readings.length === 0) {
+                entriesEl.innerHTML = '<tr><td colspan="2" class="empty">No entries yet</td></tr>';
+                return;
+            }
+            for (const reading of readings) {
+                const row = document.createElement("tr");
+                for (const value of [reading.id, reading.inches.toFixed(1)]) {
+                    const td = document.createElement("td");
+                    td.textContent = value;
+                    row.appendChild(td);
+                }
+                entriesEl.appendChild(row);
+            }
+        }
 
         async function refresh() {
             try {
+                const listRes = await fetch("/api/readings");
+                if (listRes.ok) {
+                    renderEntries(await listRes.json());
+                }
+
                 const res = await fetch("/api/sensor");
                 const data = await res.json();
-                if (data.distance === null || data.distance === undefined) {
+                if (data.inches === null || data.inches === undefined) {
                     statusEl.textContent = "Waiting for data...";
                     return;
                 }
-                distanceEl.textContent = Number(data.distance).toFixed(1);
+                distanceEl.textContent = Number(data.inches).toFixed(1);
                 statusEl.textContent = "Connected";
                 updatedEl.textContent = new Date(data.time).toLocaleTimeString();
             } catch (err) {

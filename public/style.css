@@ -60,3 +60,41 @@ h1 {
     font-size: 0.85rem;
     opacity: 0.8;
 }
+
+.log-title {
+    margin: 1.5rem 0 0.5rem;
+    font-size: 1.1rem;
+}
+
+.log {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+}
+
+.log table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.log th,
+.log td {
+    padding: 0.4rem 0.6rem;
+    text-align: center;
+}
+
+.log th {
+    position: sticky;
+    top: 0;
+    background: rgba(10, 31, 68, 0.9);
+}
+
+.log tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.log .empty {
+    opacity: 0.7;
+}

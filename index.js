@@ -15,7 +15,9 @@ const db = mysql.createPool({
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-let latest = { distance: null, time: null };
+let latest = { distance: null, inches: null, time: null };
+
+const toInches = (cm) => Math.round((cm / 2.54) * 10) / 10;
 
 app.post("/api/sensor", async (req, res) => {
     console.log(req.body);
@@ -31,7 +33,7 @@ app.post("/api/sensor", async (req, res) => {
         return res.status(500).json({ message: "Database error" });
     }
 
-    latest = { distance, time: Date.now() };
+    latest = { distance, inches: toInches(distance), time: Date.now() };
     res.json({
         message: "Sensor data received"
     });
@@ -39,6 +41,21 @@ app.post("/api/sensor", async (req, res) => {
 
 app.get("/api/sensor", (req, res) => {
     res.json(latest);
+});
+
+app.get("/api/readings", async (req, res) => {
+    try {
+        const [rows] = await db.execute(
+            "SELECT distance_id, distance FROM distance ORDER BY distance_id DESC LIMIT 1000"
+        );
+        res.json(rows.map((r) => ({
+            id: r.distance_id,
+            inches: toInches(r.distance)
+        })));
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Database error" });
+    }
 });
 
 [3000, 8080].forEach((p) => {
